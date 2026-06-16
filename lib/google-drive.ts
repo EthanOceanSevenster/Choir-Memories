@@ -18,10 +18,12 @@ async function getAccessToken(): Promise<string> {
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Token refresh failed: ${err}`);
+    console.error("[google-drive] Token refresh failed:", res.status, err);
+    throw new Error(`Token refresh failed (${res.status}): ${err}`);
   }
 
   const data = await res.json();
+  console.log("[google-drive] Token refreshed successfully");
   cachedToken = {
     access_token: data.access_token,
     expires_at: Date.now() + data.expires_in * 1000,
@@ -56,7 +58,8 @@ export async function initResumableUpload(
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Failed to initiate upload: ${error}`);
+    console.error("[google-drive] Drive API error:", response.status, error);
+    throw new Error(`Failed to initiate upload (${response.status}): ${error}`);
   }
 
   const sessionUri = response.headers.get("Location");

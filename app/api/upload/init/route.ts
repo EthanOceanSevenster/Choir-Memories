@@ -33,12 +33,21 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    console.log("[upload/init] Starting upload:", { fileName, mimeType, fileSize });
+    console.log("[upload/init] Env check:", {
+      hasClientId: !!process.env.GOOGLE_CLIENT_ID,
+      hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+      hasRefreshToken: !!process.env.GOOGLE_REFRESH_TOKEN,
+      hasFolderId: !!process.env.GOOGLE_DRIVE_FOLDER_ID,
+    });
     const sessionUri = await initResumableUpload(fileName, mimeType, fileSize);
+    console.log("[upload/init] Success, got session URI");
     return NextResponse.json({ sessionUri });
   } catch (error) {
-    console.error("Failed to init upload:", error);
+    console.error("[upload/init] Failed:", error instanceof Error ? error.message : error);
+    console.error("[upload/init] Stack:", error instanceof Error ? error.stack : "no stack");
     return NextResponse.json(
-      { error: "Upload initiation failed" },
+      { error: error instanceof Error ? error.message : "Upload initiation failed" },
       { status: 500 }
     );
   }
