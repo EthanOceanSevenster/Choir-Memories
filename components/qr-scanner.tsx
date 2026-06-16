@@ -89,26 +89,20 @@ export function QrScanner() {
       <div
         id="qr-reader"
         ref={scannerRef}
-        className="overflow-hidden rounded-2xl bg-black"
+        className="overflow-hidden rounded-xl bg-black ring-1 ring-white/10"
         style={{ display: scanning ? "block" : "none" }}
       />
       <div id="qr-reader-file" style={{ display: "none" }} />
 
-      {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+      {error && <p className="text-sm text-red-400 text-center">{error}</p>}
 
       {!scanning ? (
         <>
           <button
             onClick={startScanner}
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-700 px-4 py-3.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-800 active:bg-amber-900 transition-colors min-h-[48px]"
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--color-gold)] px-4 py-3.5 text-sm font-semibold text-[#0f0f1e] shadow-lg shadow-[var(--color-gold)]/20 hover:bg-[var(--color-gold-dim)] active:scale-[0.98] transition-all min-h-[48px]"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-            >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -125,15 +119,9 @@ export function QrScanner() {
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full flex items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-3.5 text-sm font-semibold text-stone-700 shadow-sm hover:bg-stone-50 active:bg-stone-100 transition-colors min-h-[48px]"
+            className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm font-semibold text-white/70 hover:bg-white/10 active:scale-[0.98] transition-all min-h-[48px]"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-            >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -154,7 +142,7 @@ export function QrScanner() {
       ) : (
         <button
           onClick={stopScanner}
-          className="w-full flex items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-3.5 text-sm font-semibold text-stone-700 shadow-sm hover:bg-stone-50 active:bg-stone-100 transition-colors min-h-[48px]"
+          className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm font-semibold text-white/70 hover:bg-white/10 active:scale-[0.98] transition-all min-h-[48px]"
         >
           Cancel
         </button>

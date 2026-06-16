@@ -14,7 +14,7 @@ interface UploadItem {
   statusText?: string;
 }
 
-const CHUNK_SIZE = 3.5 * 1024 * 1024; // 3.5MB per chunk
+const CHUNK_SIZE = 3.5 * 1024 * 1024;
 const MAX_CONCURRENT = 2;
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp|heic|heif|bmp|tiff?)$/i;
 
@@ -27,7 +27,6 @@ async function uploadFile(
   onProgress: (progress: number) => void,
   onStatus: (status: string) => void
 ): Promise<void> {
-  // Phase 1: Initiate resumable upload session
   onStatus("Preparing...");
   onProgress(5);
 
@@ -50,7 +49,6 @@ async function uploadFile(
   onStatus("Uploading...");
   onProgress(10);
 
-  // Phase 2: Upload in chunks
   let offset = 0;
   while (offset < file.size) {
     const end = Math.min(offset + CHUNK_SIZE, file.size);
@@ -73,7 +71,6 @@ async function uploadFile(
     }
 
     offset = end;
-    // Scale progress from 10% to 100%
     onProgress(10 + Math.round((offset / file.size) * 90));
   }
 }
@@ -105,22 +102,11 @@ export function UploadZone() {
 
       uploadFile(
         item.file,
-        (progress) => {
-          updateItem(item.id, { progress });
-        },
-        (statusText) => {
-          updateItem(item.id, { statusText });
-        }
+        (progress) => updateItem(item.id, { progress }),
+        (statusText) => updateItem(item.id, { statusText })
       )
-        .then(() => {
-          updateItem(item.id, { status: "complete", progress: 100 });
-        })
-        .catch((err) => {
-          updateItem(item.id, {
-            status: "error",
-            errorMessage: err.message,
-          });
-        })
+        .then(() => updateItem(item.id, { status: "complete", progress: 100 }))
+        .catch((err) => updateItem(item.id, { status: "error", errorMessage: err.message }))
         .finally(() => {
           uploadingCount.current--;
           processQueue();
@@ -171,74 +157,49 @@ export function UploadZone() {
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
+        className={`rounded-xl border border-dashed p-8 text-center transition-colors ${
           isDragging
-            ? "border-amber-500 bg-amber-50"
-            : "border-stone-300 bg-white/60"
+            ? "border-[var(--color-gold)] bg-[var(--color-gold-glow)]"
+            : "border-white/10 bg-white/[0.02]"
         }`}
       >
-        {/* Camera/photo icon */}
-        <svg
-          className="mx-auto h-10 w-10 text-stone-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
-          />
-        </svg>
-        <p className="mt-3 text-sm text-stone-500">
-          Drag & drop your photos here
-        </p>
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/5">
+          <svg
+            className="h-6 w-6 text-white/30"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
+            />
+          </svg>
+        </div>
+        <p className="text-sm text-white/30">Drag & drop your photos here</p>
       </div>
 
       {/* Buttons */}
       <div className="flex gap-3">
         <label
           htmlFor="photo-input"
-          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-amber-700 px-4 py-3.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-800 active:bg-amber-900 transition-colors min-h-[48px] cursor-pointer"
+          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[var(--color-gold)] px-4 py-3.5 text-sm font-semibold text-[#0f0f1e] shadow-lg shadow-[var(--color-gold)]/20 hover:bg-[var(--color-gold-dim)] active:scale-[0.98] transition-all min-h-[48px] cursor-pointer"
         >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
-            />
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
           </svg>
           Select Photos
         </label>
 
         <label
           htmlFor="camera-input"
-          className="flex items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-3.5 text-sm font-semibold text-stone-700 shadow-sm hover:bg-stone-50 active:bg-stone-100 transition-colors min-h-[48px] cursor-pointer"
+          className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm font-semibold text-white/70 hover:bg-white/10 active:scale-[0.98] transition-all min-h-[48px] cursor-pointer"
         >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
-            />
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
           </svg>
           Camera
         </label>
@@ -268,7 +229,7 @@ export function UploadZone() {
         }}
       />
 
-      {/* Upload status summary */}
+      {/* Upload status */}
       <UploadStatus total={items.length} completed={completed} errors={errors} />
 
       {/* File list */}

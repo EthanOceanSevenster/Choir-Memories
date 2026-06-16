@@ -13,22 +13,27 @@ export default async function Home() {
   if (!hasAccess) {
     return (
       <main className="flex flex-1 flex-col items-center justify-center p-4 py-10">
-        <div className="w-full max-w-md space-y-6 text-center">
-          {/* Cross icon */}
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100/80 ring-4 ring-amber-50">
-            <svg className="h-8 w-8 text-amber-700" viewBox="0 0 24 24" fill="currentColor">
+        <div className="w-full max-w-md space-y-8 text-center">
+          {/* Cross icon with glow */}
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[var(--color-gold-glow)] ring-1 ring-[var(--color-gold)]/30">
+            <svg className="h-9 w-9 text-[var(--color-gold)]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M11 2a1 1 0 0 1 2 0v7h7a1 1 0 1 1 0 2h-7v11a1 1 0 1 1-2 0V11H4a1 1 0 1 1 0-2h7V2z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-stone-800">Welcome, Blessed One</h1>
-          <p className="text-sm text-stone-500">
-            Scan the QR code to enter our choir photo album.
-          </p>
+
+          <div>
+            <h1 className="text-3xl font-bold text-white">Welcome</h1>
+            <p className="mt-2 text-sm text-white/50">
+              Scan the QR code to access our choir photo album
+            </p>
+          </div>
         </div>
-        <div className="w-full max-w-md mt-4">
+
+        <div className="w-full max-w-md mt-6">
           <QrScanner />
         </div>
-        <p className="mt-8 text-center text-xs text-stone-400 italic">
+
+        <p className="mt-10 text-center text-xs text-white/25 italic">
           &ldquo;Make a joyful noise unto the Lord&rdquo; &mdash; Psalm 100:1
         </p>
       </main>
@@ -36,12 +41,12 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center p-4 py-10">
+    <main className="flex flex-1 flex-col items-center p-4 py-8">
       <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
-          {/* Dove / music icon */}
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100/80 ring-4 ring-amber-50">
-            <svg className="h-8 w-8 text-amber-700" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        {/* Header */}
+        <div className="text-center pt-4 pb-2">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-gold-glow)] ring-1 ring-[var(--color-gold)]/30">
+            <svg className="h-7 w-7 text-[var(--color-gold)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -49,13 +54,18 @@ export default async function Home() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-stone-800">Choir Memories</h1>
-          <p className="mt-1.5 text-sm text-stone-500">
-            Share your photos from our blessed moments together
+          <h1 className="text-2xl font-bold text-white">Choir Memories</h1>
+          <p className="mt-1 text-sm text-white/40">
+            Share your photos from our blessed moments
           </p>
         </div>
-        <UploadZone />
-        <p className="text-center text-xs text-stone-400 italic">
+
+        {/* Upload card */}
+        <div className="rounded-2xl bg-[var(--color-card)] p-5 ring-1 ring-white/5">
+          <UploadZone />
+        </div>
+
+        <p className="text-center text-xs text-white/20 italic">
           &ldquo;Sing to the Lord a new song&rdquo; &mdash; Psalm 96:1
         </p>
       </div>

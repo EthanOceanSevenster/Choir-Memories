@@ -2,6 +2,11 @@
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
+  --color-card: #1a1a2e;
+  --color-surface: #16162a;
+  --color-gold: #d4a853;
+  --color-gold-dim: #b8923f;
+  --color-gold-glow: rgba(212, 168, 83, 0.15);
 }
 
 body {

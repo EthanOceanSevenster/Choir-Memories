@@ -16,6 +16,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: "#0f0f1e",
 };
 
 export default function RootLayout({
@@ -25,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-      <body suppressHydrationWarning className="min-h-full flex flex-col bg-gradient-to-b from-amber-50 via-orange-50/30 to-stone-50">
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-[#0f0f1e] text-white">
         {children}
       </body>
     </html>
