@@ -1,20 +1,41 @@
-import { google } from "googleapis";
+let cachedToken: { access_token: string; expires_at: number } | null = null;
 
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET
-);
+async function getAccessToken(): Promise<string> {
+  if (cachedToken && Date.now() < cachedToken.expires_at - 60_000) {
+    return cachedToken.access_token;
+  }
 
-oauth2Client.setCredentials({
-  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-});
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: process.env.GOOGLE_CLIENT_ID!,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+      refresh_token: process.env.GOOGLE_REFRESH_TOKEN!,
+      grant_type: "refresh_token",
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Token refresh failed: ${err}`);
+  }
+
+  const data = await res.json();
+  cachedToken = {
+    access_token: data.access_token,
+    expires_at: Date.now() + data.expires_in * 1000,
+  };
+
+  return cachedToken.access_token;
+}
 
 export async function initResumableUpload(
   fileName: string,
   mimeType: string,
   fileSize: number
 ): Promise<string> {
-  const { token } = await oauth2Client.getAccessToken();
+  const token = await getAccessToken();
 
   const response = await fetch(
     "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
