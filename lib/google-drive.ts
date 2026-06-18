@@ -32,12 +32,62 @@ async function getAccessToken(): Promise<string> {
   return cachedToken.access_token;
 }
 
+async function findOrCreateFolder(
+  token: string,
+  folderName: string,
+  parentId: string
+): Promise<string> {
+  const query = `name='${folderName.replace(/'/g, "\\'")}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+  const searchRes = await fetch(
+    `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id)`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+  if (searchRes.ok) {
+    const data = await searchRes.json();
+    if (data.files && data.files.length > 0) {
+      console.log("[google-drive] Found existing folder:", folderName, data.files[0].id);
+      return data.files[0].id;
+    }
+  }
+
+  const createRes = await fetch("https://www.googleapis.com/drive/v3/files", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: folderName,
+      mimeType: "application/vnd.google-apps.folder",
+      parents: [parentId],
+    }),
+  });
+
+  if (!createRes.ok) {
+    const err = await createRes.text();
+    console.error("[google-drive] Folder creation failed:", createRes.status, err);
+    throw new Error(`Failed to create folder (${createRes.status}): ${err}`);
+  }
+
+  const folder = await createRes.json();
+  console.log("[google-drive] Created new folder:", folderName, folder.id);
+  return folder.id;
+}
+
 export async function initResumableUpload(
   fileName: string,
   mimeType: string,
-  fileSize: number
+  fileSize: number,
+  userName?: string
 ): Promise<string> {
   const token = await getAccessToken();
+  const rootFolderId = process.env.GOOGLE_DRIVE_FOLDER_ID!;
+
+  let targetFolderId = rootFolderId;
+  if (userName) {
+    targetFolderId = await findOrCreateFolder(token, userName, rootFolderId);
+  }
 
   const response = await fetch(
     "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
@@ -51,7 +101,7 @@ export async function initResumableUpload(
       },
       body: JSON.stringify({
         name: fileName,
-        parents: [process.env.GOOGLE_DRIVE_FOLDER_ID],
+        parents: [targetFolderId],
       }),
     }
   );
